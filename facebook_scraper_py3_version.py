@@ -53,8 +53,13 @@ def automate(driver, user, password, timeout=30):
     elem.send_keys(password)
     elem.send_keys(Keys.RETURN)
     #wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1qv9"))).click()
-    wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div/div[1]/div/div/div/div[2]/div[1]/div[1]/div/a"))).click()
-    wait.until(EC.element_to_be_clickable((By.XPATH,"/html/body/div[1]/div[3]/div[1]/div/div[2]/div[2]/div[1]/div/div[1]/div/div[3]/div/div[2]/div[2]/ul/li[3]/a"))).click()
+    wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[1]/div[2]/div/div[1]/div/div/div/div[2]/div[1]/div[1]/div/a")))#.click()
+    #wait.until(EC.element_to_be_clickable((By.XPATH,"/html/body/div[1]/div[3]/div[1]/div/div[2]/div[2]/div[1]/div/div[1]/div/div[3]/div/div[2]/div[2]/ul/li[3]/a"))).click()
+    driver.get("https://www.facebook.com/profile.php")
+    while (driver.current_url == "https://www.facebook.com/profile.php"):
+    	time.sleep(0.1)
+    
+    driver.get(driver.current_url[0:-2] + "/friends")
 
     while True:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -140,7 +145,9 @@ def main():
     print("Done!.. (%s)\nProcessing data... \n"%sec_to_hms(time.time()-s))
     driver.quit()
 
-    ids = re.findall('friend_list_item.+?data-profileid="(.+?)"', htmlpage)
+    friend_list_items = re.findall("friend_list_item(.+?)friends_tab", htmlpage)
+    friend_list_items = "".join(friend_list_items)
+    ids = re.findall("www.facebook.com\/(.+?)[&]?[a]?[m]?[p]?[;]?[\?]?fref=pb&amp;hc_location=", friend_list_items)
     names = re.findall('friend_list_item.+?aria-label="(.+?)"', htmlpage)
 
     print("%s friends found!"%len(ids))

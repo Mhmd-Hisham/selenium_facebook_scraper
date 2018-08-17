@@ -18,6 +18,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
 
 def opt_parser():
     """Parse command-line options."""
@@ -44,12 +45,14 @@ def check_page_loaded(driver):
         return existing
     except:
         return False
+
 def sec_to_hms(sec):
     h = sec / 3600
     sec %= 3600
     m = sec / 60
     sec %= 60
     return '%02d:%02d:%02d' % (h, m, sec)
+
 def export_as_csv(names, ids):
     filename = 'facebook_friends from %s.csv'%time.strftime("%Y-%m-%d %H-%M-%S")
 
@@ -61,6 +64,7 @@ def export_as_csv(names, ids):
             writer.writerow([names[i], ids[i]])
 
     return filename
+
 def export_as_html(htmlpage):
     filename = 'facebook_friends from %s.html'%time.strftime("%Y-%m-%d %H-%M-%S")
 
@@ -68,6 +72,7 @@ def export_as_html(htmlpage):
         htmlfile.write(htmlpage)
 
     return filename
+
 def export_as_json(names, ids):
     filename = 'facebook_friends from %s.json'%time.strftime("%Y-%m-%d %H-%M-%S")
 
@@ -79,11 +84,13 @@ def export_as_json(names, ids):
         json.dump(data, jsonfile, indent=4)
 
     return filename
+
 def import_from_htmlfile(path_to_htmlfile):
     with open(path_to_htmlfile, "r", encoding="utf-8") as htmlfile:
         htmlpage = htmlfile.read()
 
     return htmlpage
+
 def get_login_data():
     user = input("Email: ")
     password = ""
@@ -97,6 +104,7 @@ def get_login_data():
         password = ""
 
     return user, password
+
 def get_login_data_from_file(filename):
     with open(filename, "r", encoding="utf-8") as login_file:
         user = login_file.readlines(1)
@@ -125,15 +133,10 @@ def automate(driver, user, password, timeout=30, verbose=False):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         if check_page_loaded(driver):
             break
-
     return driver.page_source
 
 def start(options):
     """Start the program and handle options"""
-    if options.verbose:
-        s = time.time()
-        print("Loading html page... ", end="", flush=True)
-
     if options.loginfile:
         try:
             user, password = get_login_data_from_file(options.loginfile)
@@ -146,6 +149,9 @@ def start(options):
     else:
         user, password = get_login_data()
 
+    if options.verbose:
+        s = time.time()
+        print("Loading html page... ", end="", flush=True)
     firefox_options = Options()
     firefox_options.set_headless(headless=options.headless)
 
@@ -159,7 +165,7 @@ def start(options):
 
     if options.verbose:
         print("Done!.. (%s)\n"%sec_to_hms(time.time()-s))
-
+    
     return htmlpage
 
 def main():
@@ -181,9 +187,24 @@ def main():
     if options.verbose:
         print("Processing data... ")
 
-    ids = re.findall('friend_list_item.+?data-profileid="(.+?)"', htmlpage)
-    names = re.findall('friend_list_item.+?aria-label="(.+?)"', htmlpage)
+    friend_list_items = BeautifulSoup(htmlpage, "html.parser").find_all("li", class_="_698")
+    names = []
+    ids = []
+    
+    for item in friend_list_items:
+    	try:
+    		if (item.find_all("a")[2].text[0].isdigit()):
+    			continue
+    		names.append(item.find_all("a")[2].text)
+    		ids.append(re.findall("www.facebook.com\/(.+?)[&]?[a]?[m]?[p]?[;]?[\?]?fref=pb", item.find_all("a")[2].attrs['href'])[0])
+    	except:
+    		names.append(item.find_all("a")[1].text + "(Deactivated)")
+    		try:
+    			ids.append(item.find_all("a")[0].attrs['data-profileid'])
+    		except:
+    			continue
 
+    #print("names length: " + len(names) + " ids length: " + len(ids))   			
     if options.verbose:
         print("%s friends found!"%len(ids))
 

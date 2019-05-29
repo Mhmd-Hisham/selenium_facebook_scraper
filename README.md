@@ -7,4 +7,7 @@ In order to use the script you need to:
     1- install selenium in python3 [for linux users: pip3 install selenium]
     2- install BeautifulSoup4 for python3 [Linux users: pip3 install bs4]
     3- download and install geckodriver for firefox from here: https://github.com/mozilla/geckodriver/releases/
+    
+    
+![](example.gif)
 

@@ -7,9 +7,7 @@ This is a simple python3 script used to download a users's friend list from face
 
 ## Usage
 ```
-python3 facebook_scraper.py --help
-```
-```
+user:~$ python3 facebook_scraper.py --help
 usage: facebook_scraper.py [-h] [-v] [-b] [-t TIMEOUT] [-j] [-c] [-s] [-i HTMLPAGE] [-l LOGINFILE]
 
 Use Selenium & Firefox to automate Facebook login and scrape user's friend list.

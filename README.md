@@ -1,6 +1,6 @@
 # Python3 Facebook Scraper
 
-This is a simple python3 script used to download a users's friend list from facebook. The script uses selenium & Firefox to automate the login process and extract the data from the user's account. All you have to do is to write the email and password and the script will do all the work. Simple!
+This is a simple python3 script used to download a user's friend list from facebook. The script uses selenium & Firefox to automate the login process and extract the data from the user's account. All you have to do is to write the email and password and the script will do all the work. Simple!
 
 ![Example](example.gif)
 

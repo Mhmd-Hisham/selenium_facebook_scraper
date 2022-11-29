@@ -41,13 +41,13 @@ def opt_parser():
     return parser.parse_args()
 
 def check_page_loaded(driver):
-    """Check whether the page is loaded or not. """
+    """Check whether the page is loaded or not """
     try:
         existing = False
         elements = driver.find_elements_by_class_name("uiHeaderTitle")
 
         for element in elements:
-            if (element.get_attribute('innerHTML') == "More About You"):
+            if (element.get_attribute('innerHTML') == "More About You."):
                 existing = True
 
         return existing
